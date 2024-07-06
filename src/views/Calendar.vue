@@ -57,7 +57,6 @@
 
 
     // ---- filter rooms by room type
-
     const roomTypes = computed(() => {
         return new Set(rooms.value.map(r => r.roomType))
     })
@@ -79,7 +78,6 @@
     })
 
     // ---- unassigned bookign list
-
     const unassignedBookings = computed(() => {
         return bookings.value.filter(b => b.roomId === "" && b.roomType === currentRoomType.value)
     })
@@ -93,6 +91,41 @@
         s.setDate(s.getDate() - diff)
         start.value = s
     }
+
+
+    // ---- Drag and Drop Functionality
+    const dragging = ref([])
+    const dropOnRoom = (room) => {
+        dragging.value.forEach(b => {
+            // check room available
+            const s = new Date(b.checkInDate)
+            const e = new Date(b.checkOutDate)
+            const ds = (e - s) / 3600 / 24 / 1000
+
+            let available = true
+            for(let i = 0; i < ds; i++) {
+                const nd = new Date(s)
+                nd.setDate(nd.getDate() + i)
+                if (roomBookings(room, nd).length > 0) {
+                    available = false
+                    break
+                }
+            }
+
+            if (available) {
+                b.roomId = room.id
+            }
+        })
+
+        dragging.value = []
+    }
+
+    const dropOnUnssigned = () => {
+        dragging.value.forEach(b => b.roomId = "")
+        dragging.value = []
+    }
+
+    document.addEventListener('mouseup', () => dragging.value = [])
 
 
     // ---- Reset Button
@@ -153,13 +186,20 @@
             {{ bookings[0] }}
 
             <div>
-                <div v-for="room in currentRooms" class="room">
+                <div 
+                    v-for="room in currentRooms" 
+                    class="room"
+                    @mouseup.prevent.stop="dropOnRoom(room)">
                     <div class="room-id">{{ room.id }}</div>
                     <div v-for="d in days" class="day-box">
                         <div v-if="roomBookings(room, d).length === 0" class="booking">
                             ---
                         </div>
-                        <div v-else v-for="b in roomBookings(room, d)" class="booking" :style="bookingStyle(b)">
+                        <div v-else 
+                            v-for="b in roomBookings(room, d)" 
+                            class="booking" 
+                            :style="bookingStyle(b)"
+                            @mousedown="dragging = [b]">
                             {{ b.id.slice(-3) }}
                         </div>
                     </div>
@@ -178,11 +218,12 @@
                 </a>
             </div>
 
-            <div class="unassigned-bookings">
+            <div class="unassigned-bookings" @mouseup="dropOnUnssigned">
                 <div v-for="b in unassignedBookings" 
                     class="unassigned-booking"
                     :style="{borderColor: roomTypeColors[b.roomType]}"
-                    @click="adjustToBookingDays(b)">
+                    @click="adjustToBookingDays(b)"
+                    @mousedown="dragging = [b]">
                     {{ b.id }}
                     {{ b.guestName }}
                     <span>
@@ -243,6 +284,7 @@
 
         display: flex;
         flex-direction: column;
+        user-select: none;
     }
 
     .booking {
@@ -284,6 +326,7 @@
         gap: 0 .5rem;
 
         cursor: pointer;
+        user-select: none;
     }
 
     .unassigned-booking span {
