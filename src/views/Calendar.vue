@@ -56,6 +56,8 @@
     }
 
 
+    // ---- filter rooms by room type
+
     const roomTypes = computed(() => {
         return new Set(rooms.value.map(r => r.roomType))
     })
@@ -74,6 +76,12 @@
         } else {
             return rooms.value
         }
+    })
+
+    // ---- unassigned bookign list
+
+    const unassignedBookings = computed(() => {
+        return bookings.value.filter(b => b.roomId === "" && b.roomType === currentRoomType.value)
     })
 </script>
 
@@ -115,6 +123,20 @@
                     :style="{background: roomTypeColors[roomType]}">
                     {{ roomType }}
                 </a>
+            </div>
+
+            <div class="unassigned-bookings">
+                <div v-for="b in unassignedBookings" 
+                    class="unassigned-booking"
+                    :style="{borderColor: roomTypeColors[b.roomType]}">
+                    {{ b.id }}
+                    {{ b.guestName }}
+                    <span>
+                        {{ b.checkInDate }}
+                        {{ b.checkOutDate }}
+                        {{ b.numberOfGuests }}
+                    </span>
+                </div>
             </div>
         </aside>
     </div>
@@ -196,5 +218,17 @@
     }
     .btn.active {
         border-width: 6px;
+    }
+
+    .unassigned-booking {
+        border: 3px solid #ccc;
+        margin: .5rem 0;
+        padding: .25rem;
+        display: flex;
+        gap: 0 .5rem;
+    }
+
+    .unassigned-booking span {
+        margin-left: auto;
     }
 </style>
