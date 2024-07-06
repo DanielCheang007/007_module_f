@@ -165,10 +165,10 @@
 
 
     // ---- Export/Import Functionality
-    const export = () => {
-        const data = bookings.value.map(b => `${b.id}, ${b.roomId}`).join("\r\n")
-        //... save to files
-    }
+    // const export = () => {
+    //     const data = bookings.value.map(b => `${b.id}, ${b.roomId}`).join("\r\n")
+    //     //... save to files
+    // }
 </script>
 
 <template>
