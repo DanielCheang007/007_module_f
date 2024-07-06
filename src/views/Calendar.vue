@@ -54,37 +54,80 @@
             background: `#DD${x}D${y}D`
         }
     }
+
+
+    const roomTypes = computed(() => {
+        return new Set(rooms.value.map(r => r.roomType))
+    })
+
+    const roomTypeColors = {
+        "Deluxe": "#3d5875",
+        "Standard": "#548c7f",
+        "Suite": "#3081ed",
+        "Single": "#00b2e6",
+        "Double": "#e86f8e"
+    }
+    const currentRoomType = ref("Deluxe")
+    const currentRooms = computed(() => {
+        if (currentRoomType.value) {
+            return rooms.value.filter(r => r.roomType === currentRoomType.value)
+        } else {
+            return rooms.value
+        }
+    })
 </script>
 
 <template>
     Calendar
 
-    <div class="day-wrapper">
-        <div class="room-placeholder"></div>
-        <div v-for="d in days" class="day" @click="adjustStart(d)">
-            {{ d.getDate() }}
-        </div>
-    </div>
+    <div class="calendar">
+        <div>    
+            <div class="day-wrapper">
+                <div class="room-placeholder"></div>
+                <div v-for="d in days" class="day" @click="adjustStart(d)">
+                    {{ d.getDate() }}
+                </div>
+            </div>
 
-    {{ rooms[0] }} <br>
-    {{ bookings[0] }}
+            {{ rooms[0] }} <br>
+            {{ bookings[0] }}
 
-    <div>
-        <div v-for="room in rooms" class="room">
-            <div class="room-id">{{ room.id }}</div>
-            <div v-for="d in days" class="day-box">
-                <template v-if="roomBookings(room, d).length === 0">
-                    ---
-                </template>
-                <div v-else v-for="b in roomBookings(room, d)" class="booking" :style="bookingStyle(b)">
-                    {{ b.id.slice(-3) }}
+            <div>
+                <div v-for="room in currentRooms" class="room">
+                    <div class="room-id">{{ room.id }}</div>
+                    <div v-for="d in days" class="day-box">
+                        <div v-if="roomBookings(room, d).length === 0" class="booking">
+                            ---
+                        </div>
+                        <div v-else v-for="b in roomBookings(room, d)" class="booking" :style="bookingStyle(b)">
+                            {{ b.id.slice(-3) }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <aside>
+            <div class="btn-group">
+                <a href="#" @click.prevent="currentRoomType = roomType" 
+                    v-for="roomType in roomTypes" 
+                    class="btn" 
+                    :class="{active: currentRoomType === roomType}"
+                    :style="{background: roomTypeColors[roomType]}">
+                    {{ roomType }}
+                </a>
+            </div>
+        </aside>
     </div>
 </template>
 
 <style>
+    .calendar {
+        display: flex;
+    }
+    .calendar aside {
+        width: 40%;
+    }
+
     .day-wrapper {
         display:flex;
         gap: 0 .5rem;
@@ -133,5 +176,25 @@
         flex: 1;
 
         font-size: smaller;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0 .5rem;
+    }
+    .btn {
+        display: inline-grid;
+        place-items: center;
+
+        height: 40px;
+        padding: 0 1rem;
+
+        border: 1px solid darkgray;
+        box-sizing: border-box;
+
+        color: #fff;
+    }
+    .btn.active {
+        border-width: 6px;
     }
 </style>
