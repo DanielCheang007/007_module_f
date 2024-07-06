@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, computed } from 'vue'
+    import { ref, computed, watch } from 'vue'
 
     const rooms = ref([])
     const bookings = ref([])
@@ -11,7 +11,7 @@
         const res2 = await fetch("http://localhost:5173/api/bookings.json")
         bookings.value = await res2.json()
     }
-    load()
+    // load() // load from localstorage first
 
     const DAYS = 15;
     const start = ref(new Date('2024-06-01'))
@@ -95,13 +95,39 @@
     }
 
 
-    // ---- reset
-
+    // ---- Reset Button
     const reset = () => {
         load()
         start.value = new Date('2024-06-01')
         currentRoomType.value = "Deluxe"
     }
+
+    // ---- Persistent State
+    const store = () => {
+        const data = {
+            start: start.value,
+            currentRoomType: currentRoomType.value,
+            rooms: rooms.value,
+            bookings: bookings.value
+        }
+        localStorage.setItem('data', JSON.stringify(data))
+    }
+    
+    watch(() => [start, currentRoomType, rooms, bookings], store, {deep: true})
+
+    const loadStorage = () => {
+        const data = localStorage.getItem('data')
+        if (typeof data === 'string') {
+            const {start: s, currentRoomType: c, rooms: rs, bookings: bs} = JSON.parse(data)
+            start.value = new Date(s)
+            currentRoomType.value = c
+            rooms.value = rs
+            bookings.value = bs
+        } else {
+            load()
+        }
+    }
+    loadStorage()
 </script>
 
 <template>
