@@ -15,6 +15,18 @@
 
     const DAYS = 15;
     const start = ref(new Date('2024-06-01'))
+
+    const adjustStart = (d) => {
+        const nd = new Date(d)
+        if (d.getDate() <= 7) {
+            nd.setDate(1)
+        } else if (d.getDate() >= 24) {
+            nd.setDate(16)
+        } else {
+            nd.setDate(d.getDate() - 7)
+        }
+        start.value = nd
+    }
     
     const days = computed(() => {
         return [...Array(DAYS)].map((_, i) => {
@@ -49,7 +61,7 @@
 
     <div class="day-wrapper">
         <div class="room-placeholder"></div>
-        <div v-for="d in days" class="day">
+        <div v-for="d in days" class="day" @click="adjustStart(d)">
             {{ d.getDate() }}
         </div>
     </div>
@@ -86,6 +98,8 @@
 
         display:grid;
         place-items: center;
+
+        cursor: pointer;
     }
 
     .room {
