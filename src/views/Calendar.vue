@@ -83,6 +83,16 @@
     const unassignedBookings = computed(() => {
         return bookings.value.filter(b => b.roomId === "" && b.roomType === currentRoomType.value)
     })
+
+    const adjustToBookingDays = (b) => {
+        const s = new Date(b.checkInDate)
+        const e = new Date(b.checkOutDate)
+        const ds = (e - s) / 3600 / 24 / 1000
+        const diff = (DAYS - ds) / 2 - 1
+
+        s.setDate(s.getDate() - diff)
+        start.value = s
+    }
 </script>
 
 <template>
@@ -128,7 +138,8 @@
             <div class="unassigned-bookings">
                 <div v-for="b in unassignedBookings" 
                     class="unassigned-booking"
-                    :style="{borderColor: roomTypeColors[b.roomType]}">
+                    :style="{borderColor: roomTypeColors[b.roomType]}"
+                    @click="adjustToBookingDays(b)">
                     {{ b.id }}
                     {{ b.guestName }}
                     <span>
@@ -226,6 +237,8 @@
         padding: .25rem;
         display: flex;
         gap: 0 .5rem;
+
+        cursor: pointer;
     }
 
     .unassigned-booking span {
