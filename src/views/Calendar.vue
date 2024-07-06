@@ -93,10 +93,26 @@
         s.setDate(s.getDate() - diff)
         start.value = s
     }
+
+
+    // ---- reset
+
+    const reset = () => {
+        load()
+        start.value = new Date('2024-06-01')
+        currentRoomType.value = "Deluxe"
+    }
 </script>
 
 <template>
     Calendar
+
+    <div clsas="btn-group">
+        <a href="#" @click.prevent class="btn">Export</a>
+        <a href="#" @click.prevent class="btn">Import</a>
+        <a href="#" @click.prevent="reset" class="btn">Reset</a>
+        <a href="#" @click.prevent class="btn">Fullscreen</a>
+    </div>
 
     <div class="calendar">
         <div>    
@@ -125,9 +141,10 @@
             </div>
         </div>
         <aside>
-            <div class="btn-group">
-                <a href="#" @click.prevent="currentRoomType = roomType" 
+            <div class="btn-group room-types">
+                <a href="#" 
                     v-for="roomType in roomTypes" 
+                    @click.prevent="currentRoomType = roomType" 
                     class="btn" 
                     :class="{active: currentRoomType === roomType}"
                     :style="{background: roomTypeColors[roomType]}">
@@ -224,11 +241,13 @@
 
         border: 1px solid darkgray;
         box-sizing: border-box;
-
-        color: #fff;
     }
     .btn.active {
         border-width: 6px;
+    }
+
+    .room-types .btn {
+        color: #fff;
     }
 
     .unassigned-booking {
