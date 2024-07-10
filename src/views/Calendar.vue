@@ -210,6 +210,15 @@ fileInput.addEventListener("change", () => {
 const importBookings = () => {
 	fileInput.click()
 }
+
+
+
+
+// ---- fullscreen
+
+const fullscreen = () => {
+	document.documentElement.requestFullscreen()
+}
 </script>
 
 <template>
@@ -219,7 +228,7 @@ const importBookings = () => {
 		<a href="#" @click.prevent="exportBookings" class="btn">Export</a>
 		<a href="#" @click.prevent="importBookings" class="btn">Import</a>
 		<a href="#" @click.prevent="reset" class="btn">Reset</a>
-		<a href="#" @click.prevent class="btn">Fullscreen</a>
+		<a href="#" @click.prevent="fullscreen" class="btn">Fullscreen</a>
 	</div>
 
 	<div class="calendar">
