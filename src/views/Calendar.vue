@@ -177,6 +177,41 @@ const exportBookings = () => {
 	a.click()
 	URL.revokeObjectURL(url);
 }
+
+const importFromCSV = (csvStr) => {
+	const data = csvStr.split("\r\n").slice(1).map(line => line.split(", "))
+	data.forEach(([bookingId, roomId]) => {
+		const b = bookings.value.find(b => b.id === bookingId)
+
+		// load the roomId
+		if (b) b.roomId = roomId
+	})
+}
+
+// move reader out of importBooking func, only have to create once.
+const csvReader = new FileReader();
+csvReader.addEventListener("load", () => {
+	importFromCSV(csvReader.result)
+})
+
+// the same with fileInput, only 1 global object requried
+const fileInput = document.createElement('input')
+fileInput.type = "file"
+
+fileInput.addEventListener("change", () => {
+	const [file] = fileInput.files
+
+	if (file) {
+		csvReader.readAsText(file);
+
+		// little trick, for detect change event everytime select the same file
+		fileInput.value = null
+	}
+})
+
+const importBookings = () => {
+	fileInput.click()
+}
 </script>
 
 <template>
@@ -184,7 +219,7 @@ const exportBookings = () => {
 
 	<div clsas="btn-group">
 		<a href="#" @click.prevent="exportBookings" class="btn">Export</a>
-		<a href="#" @click.prevent class="btn">Import</a>
+		<a href="#" @click.prevent="importBookings" class="btn">Import</a>
 		<a href="#" @click.prevent="reset" class="btn">Reset</a>
 		<a href="#" @click.prevent class="btn">Fullscreen</a>
 	</div>
