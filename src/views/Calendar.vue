@@ -95,24 +95,28 @@ const adjustToBookingDays = (b) => {
 
 // ---- Drag and Drop Functionality
 const dragging = ref([])
+
+const isRoomAvailable = (room, checkInDate, checkOutDate) => {
+	// check room available
+	const s = new Date(checkInDate)
+	const e = new Date(checkOutDate)
+	const ds = (e - s) / 3600 / 24 / 1000
+
+	let available = true
+	for (let i = 0; i < ds; i++) {
+		const nd = new Date(s)
+		nd.setDate(nd.getDate() + i)
+		if (roomBookings(room, nd).length > 0) {
+			available = false
+			break
+		}
+	}
+
+	return available
+}
 const dropOnRoom = (room) => {
 	dragging.value.forEach(b => {
-		// check room available
-		const s = new Date(b.checkInDate)
-		const e = new Date(b.checkOutDate)
-		const ds = (e - s) / 3600 / 24 / 1000
-
-		let available = true
-		for (let i = 0; i < ds; i++) {
-			const nd = new Date(s)
-			nd.setDate(nd.getDate() + i)
-			if (roomBookings(room, nd).length > 0) {
-				available = false
-				break
-			}
-		}
-
-		if (available) {
+		if (isRoomAvailable(room, b.checkInDate, b.checkOutDate)) {
 			b.roomId = room.id
 		}
 	})
@@ -180,9 +184,12 @@ const importFromCSV = (csvStr) => {
 	const data = csvStr.split("\r\n").slice(1).map(line => line.split(", "))
 	data.forEach(([bookingId, roomId]) => {
 		const b = bookings.value.find(b => b.id === bookingId)
+		const room = rooms.value.find(r => r.id === roomId)
 
-		// load the roomId
-		if (b) b.roomId = roomId
+		// set room only if room available 
+		if (b && room && isRoomAvailable(room, b.checkInDate, b.checkOutDate)) {
+			b.roomId = roomId
+		}
 	})
 }
 
