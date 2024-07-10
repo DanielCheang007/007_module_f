@@ -165,17 +165,25 @@ loadStorage()
 
 
 // ---- Export/Import Functionality
-// const export = () => {
-//     const data = bookings.value.map(b => `${b.id}, ${b.roomId}`).join("\r\n")
-//     //... save to files
-// }
+const exportBookings = () => {
+	const data = bookings.value.map(b => `${b.id}, ${b.roomId}`)
+	const dataStr = ["bookingId, roomId", ...data].join("\r\n")
+
+	const blob = new Blob([dataStr], { type: 'text/csv' })
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url
+	a.download = "hhh-bookings.csv"
+	a.click()
+	URL.revokeObjectURL(url);
+}
 </script>
 
 <template>
 	Calendar
 
 	<div clsas="btn-group">
-		<a href="#" @click.prevent class="btn">Export</a>
+		<a href="#" @click.prevent="exportBookings" class="btn">Export</a>
 		<a href="#" @click.prevent class="btn">Import</a>
 		<a href="#" @click.prevent="reset" class="btn">Reset</a>
 		<a href="#" @click.prevent class="btn">Fullscreen</a>
@@ -308,7 +316,7 @@ loadStorage()
 	padding: 0 1rem;
 
 	border: 1px solid darkgray;
-	box-sizing: border-box;
+	/* box-sizing: border-box; */
 }
 
 .btn.active {
