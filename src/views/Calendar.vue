@@ -39,12 +39,16 @@ const days = computed(() => {
 const toStr = (date) => date.toISOString().slice(0, 10)
 
 //TODO: refactor later
-const roomBookings = (room, date) => {
+const roomBookings = (room, date, includeCheckOut = true) => {
 	const bs = bookings.value.filter(b => b.roomId === room.id)
 	return bs.filter(b => {
 		const s = new Date(b.checkInDate)
 		const e = new Date(b.checkOutDate)
-		return (date >= s && date <= e)
+		if (includeCheckOut) {
+			return (date >= s && date <= e)
+		} else {
+			return (date >= s && date < e)
+		}
 	})
 }
 
@@ -106,7 +110,7 @@ const isRoomAvailable = (room, checkInDate, checkOutDate) => {
 	for (let i = 0; i < ds; i++) {
 		const nd = new Date(s)
 		nd.setDate(nd.getDate() + i)
-		if (roomBookings(room, nd).length > 0) {
+		if (roomBookings(room, nd, false).length > 0) {
 			available = false
 			break
 		}
