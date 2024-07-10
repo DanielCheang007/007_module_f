@@ -125,8 +125,6 @@ const dropOnUnssigned = () => {
 	dragging.value = []
 }
 
-document.addEventListener('mouseup', () => dragging.value = [])
-
 
 // ---- Reset Button
 const reset = () => {
