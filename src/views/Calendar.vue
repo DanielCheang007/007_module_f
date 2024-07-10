@@ -235,27 +235,24 @@ const fullscreen = () => {
 <template>
 	Calendar
 
-	<div clsas="btn-group">
+	<div class="global-btns btn-group">
 		<a href="#" @click.prevent="exportBookings" class="btn">Export</a>
 		<a href="#" @click.prevent="importBookings" class="btn">Import</a>
 		<a href="#" @click.prevent="reset" class="btn">Reset</a>
 		<a href="#" @click.prevent="fullscreen" class="btn">Fullscreen</a>
 	</div>
 
-	<div class="calendar">
-		<div>
-			<div class="day-wrapper">
+	<div class="calendar flex">
+		<main>
+			<div class="day-wrapper flex">
 				<div class="room-placeholder"></div>
 				<div v-for="d in days" class="day" @click="adjustStart(d)">
 					{{ d.getDate() }}
 				</div>
 			</div>
 
-			{{ rooms[0] }} <br>
-			{{ bookings[0] }}
-
 			<div>
-				<div v-for="room in currentRooms" class="room" @drop="dropOnRoom(room)" @dragover.prevent>
+				<div v-for="room in currentRooms" class="room flex" @drop="dropOnRoom(room)" @dragover.prevent>
 					<div class="room-id">{{ room.id }}</div>
 					<div v-for="d in days" class="day-box">
 						<div v-if="roomBookings(room, d).length === 0" class="booking">
@@ -268,7 +265,7 @@ const fullscreen = () => {
 					</div>
 				</div>
 			</div>
-		</div>
+		</main>
 		<aside>
 			<div class="btn-group room-types">
 				<a href="#" v-for="roomType in roomTypes" @click.prevent="currentRoomType = roomType" class="btn"
@@ -295,16 +292,36 @@ const fullscreen = () => {
 </template>
 
 <style>
-.calendar {
+.flex {
 	display: flex;
+}
+
+.flex>* {
+	flex: 1;
+}
+
+.global-btns {
+	float: right;
+	margin-bottom: 2rem;
+}
+
+.calendar {
+	margin: 1rem 0;
+	gap: 0 .5rem;
+	clear: both;
+}
+
+.calendar main {
+	flex: 3;
+	overflow-x: scroll;
 }
 
 .calendar aside {
-	width: 40%;
+	flex: 1;
+	padding: 0 .5rem;
 }
 
 .day-wrapper {
-	display: flex;
 	gap: 0 .5rem;
 }
 
@@ -321,7 +338,6 @@ const fullscreen = () => {
 }
 
 .room {
-	display: flex;
 	gap: 0 .5rem;
 	margin: .5rem 0;
 }
@@ -369,7 +385,6 @@ const fullscreen = () => {
 	padding: 0 1rem;
 
 	border: 1px solid darkgray;
-	/* box-sizing: border-box; */
 }
 
 .btn.active {
